@@ -1,0 +1,21 @@
+{
+  "name": "rabbit/db-redisql",
+  "description": "rabbit db-redisql with redisql module.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "albert",
+      "email": "63851587@qq.com"
+    }
+  ],
+  "require": {
+    "rabbit/framework": "dev-master",
+    "rabbit/db-redis": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Rabbit\\DB\\Redisql\\": "src/"
+    }
+  }
+}
