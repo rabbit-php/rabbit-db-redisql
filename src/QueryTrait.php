@@ -54,7 +54,8 @@ trait QueryTrait
         if ($result !== false) {
             $res = [];
             foreach ($this->select as $index => $name) {
-                $res[$name] = $result[$index];
+                $name = explode(' ', $name);
+                $res[end($name)] = $result[$index];
             }
             $models = $this->populate([$res]);
             return reset($models) ?: null;
@@ -75,7 +76,8 @@ trait QueryTrait
         $rows = $this->createCommand($db)->queryAll();
         foreach ($rows as $i => $row) {
             foreach ($this->select as $index => $name) {
-                $res[$name] = $row[$index];
+                $name = explode(' ', $name);
+                $res[end($name)] = $row[$index];
             }
             $rows[$i] = $res;
         }
