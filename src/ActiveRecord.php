@@ -22,7 +22,7 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
      */
     public static function getDb(): ConnectionInterface
     {
-        return getDI('redisql')->getConnection();
+        return getDI('redisql')->get();
     }
 
     /**

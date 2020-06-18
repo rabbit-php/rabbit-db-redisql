@@ -21,7 +21,7 @@ class Query extends \rabbit\db\Query
     public function createCommand($db = null)
     {
         if ($db === null) {
-            $db = getDI('redisql')->getConnection();
+            $db = getDI('redisql')->get();
         }
         [$sql, $params] = $db->getQueryBuilder()->build($this);
 

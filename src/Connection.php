@@ -49,7 +49,7 @@ class Connection extends \rabbit\db\Connection implements ConnectionInterface
      */
     public function getConn()
     {
-        return PoolManager::getPool($this->poolKey)->getConnection();
+        return PoolManager::getPool($this->poolKey)->get();
     }
 
     /**
