@@ -10,8 +10,8 @@
     }
   ],
   "require": {
-    "rabbit/framework": "dev-master",
-    "rabbit/db-redis": "dev-master"
+    "rabbit/framework": "^1.0",
+    "rabbit/db-redis": "^1.0"
   },
   "autoload": {
     "psr-4": {
