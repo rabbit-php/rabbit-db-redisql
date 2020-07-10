@@ -14,7 +14,6 @@
     "ext-swoole": ">=4.5.0",
     "rabbit/base": "dev-master",
     "rabbit/parser": "dev-master",
-    "rabbit/memory": "dev-master",
     "rabbit/db": "dev-master",
     "rabbit/pool": "dev-master",
     "rabbit/active-record": "dev-master",
