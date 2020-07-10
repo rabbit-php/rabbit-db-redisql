@@ -17,6 +17,9 @@ use Throwable;
  */
 class Schema extends \Rabbit\DB\Schema
 {
+    /** @var string */
+    protected string $builderClass = QueryBuilder::class;
+
     /**
      * @param string $name
      * @return TableSchema|null
@@ -44,10 +47,5 @@ class Schema extends \Rabbit\DB\Schema
             return null;
         }
         return $columns;
-    }
-
-    public function createQueryBuilder(): \Rabbit\DB\QueryBuilder
-    {
-        return new QueryBuilder($this->db);
     }
 }
