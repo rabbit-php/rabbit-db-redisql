@@ -5,10 +5,12 @@ namespace Rabbit\DB\Redisql;
 
 use DI\DependencyException;
 use DI\NotFoundException;
-use Exception;
-use rabbit\activerecord\BaseActiveRecord;
-use rabbit\core\ObjectFactory;
-use rabbit\db\ConnectionInterface;
+use Rabbit\ActiveRecord\ActiveQueryInterface;
+use Rabbit\ActiveRecord\BaseActiveRecord;
+use Rabbit\DB\Exception;
+use Rabbit\Pool\ConnectionInterface;
+use ReflectionException;
+use Throwable;
 
 /**
  * Class ActiveRecord
@@ -18,7 +20,7 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
 {
     /**
      * @return ConnectionInterface
-     * @throws Exception
+     * @throws Throwable
      */
     public static function getDb(): ConnectionInterface
     {
@@ -26,9 +28,9 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
     }
 
     /**
-     * @return string[]
+     * @return array|string[]
      */
-    public static function primaryKey()
+    public static function primaryKey(): array
     {
         return ['id'];
     }
@@ -38,16 +40,16 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
      * @throws DependencyException
      * @throws NotFoundException
      */
-    public static function find()
+    public static function find(): ActiveQueryInterface
     {
-        return ObjectFactory::createObject(ActiveQuery::class, ['modelClass' => get_called_class()], false);
+        return create(ActiveQuery::class, ['modelClass' => get_called_class()], false);
     }
 
     /**
-     * @return mixed|\rabbit\db\TableSchema|null
-     * @throws Exception
+     * @return \Rabbit\DB\TableSchema
+     * @throws Throwable
      */
-    public static function getTableSchema()
+    public static function getTableSchema(): \Rabbit\DB\TableSchema
     {
         return getDI(TableSchema::class);
     }
@@ -55,8 +57,9 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
     /**
      * @param BaseActiveRecord $record
      * @param array $row
+     * @throws ReflectionException
      */
-    public static function populateRecord($record, $row)
+    public static function populateRecord(BaseActiveRecord $record, array $row): void
     {
         $columns = array_flip($record->attributes());
         foreach ($row as $name => $value) {
@@ -72,11 +75,12 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
     }
 
     /**
-     * @param null $attributes
+     * @param array|null $attributes
      * @return bool
-     * @throws Exception
+     * @throws ReflectionException
+     * @throws Throwable
      */
-    protected function insertInternal($attributes = null)
+    protected function insertInternal(array $attributes = null): bool
     {
         $values = $this->getDirtyAttributes($attributes);
         if (($primaryKeys = static::getDb()->schema->insert(static::tableName(), $values)) === false) {
@@ -87,11 +91,13 @@ class ActiveRecord extends \rabbit\activerecord\ActiveRecord
     }
 
     /**
-     * @param null $attributes
-     * @return false|int
-     * @throws \rabbit\db\Exception
+     * @param array|null $attributes
+     * @return int
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws Exception
      */
-    protected function updateInternal($attributes = null)
+    protected function updateInternal(array $attributes = null): int
     {
         $values = $this->getDirtyAttributes($attributes);
         if (empty($values)) {

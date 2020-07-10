@@ -3,20 +3,25 @@ declare(strict_types=1);
 
 namespace Rabbit\DB\Redisql;
 
-use rabbit\db\Exception;
-use rabbit\db\TableSchema;
+use DI\DependencyException;
+use DI\NotFoundException;
+use Psr\SimpleCache\InvalidArgumentException;
+use Rabbit\Base\Exception\NotSupportedException;
+use Rabbit\DB\Exception;
+use Rabbit\DB\TableSchema;
+use Throwable;
 
 /**
  * Class Schema
- * @package rabbit\db\clickhouse
+ * @package Rabbit\DB\Redisql
  */
-class Schema extends \rabbit\db\Schema
+class Schema extends \Rabbit\DB\Schema
 {
     /**
      * @param string $name
      * @return TableSchema|null
      */
-    protected function loadTableSchema($name)
+    protected function loadTableSchema(string $name): ?TableSchema
     {
         return null;
     }
@@ -25,13 +30,24 @@ class Schema extends \rabbit\db\Schema
      * @param string $table
      * @param array $columns
      * @return array|bool|false
+     * @throws DependencyException
+     * @throws NotFoundException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      * @throws Exception
+     * @throws Throwable
      */
-    public function insert($table, $columns)
+    public function insert(string $table, array $columns): ?array
     {
         $command = $this->db->createCommand()->insert($table, $columns);
         if (!$command->execute()) {
-            return false;
+            return null;
         }
+        return $columns;
+    }
+
+    public function createQueryBuilder(): \Rabbit\DB\QueryBuilder
+    {
+        return new QueryBuilder($this->db);
     }
 }

@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Rabbit\DB\Redisql;
 
-use rabbit\exception\NotSupportedException;
+use Rabbit\Base\Exception\NotSupportedException;
+use Rabbit\DB\ConnectionInterface;
 
 /**
  * Class QueryTrait
@@ -12,15 +13,15 @@ use rabbit\exception\NotSupportedException;
 trait QueryTrait
 {
     /** @var string */
-    protected $queryBuilder = QueryBuilder::class;
+    protected string $queryBuilder = QueryBuilder::class;
 
     /**
      * @param $columns
-     * @param null $option
+     * @param string $option
      * @return $this
      * @throws NotSupportedException
      */
-    public function select($columns, $option = null)
+    public function select($columns, string $option = null): self
     {
         if (!is_array($columns)) {
             throw new NotSupportedException("Redisql not support !array select");
@@ -37,10 +38,10 @@ trait QueryTrait
     }
 
     /**
-     * @param null $db
+     * @param ConnectionInterface $db
      * @return bool|mixed|null
      */
-    public function one($db = null)
+    public function one(ConnectionInterface $db = null)
     {
         if ($this->emulateExecution) {
             return false;
@@ -64,11 +65,10 @@ trait QueryTrait
     }
 
     /**
-     * @param null $db
+     * @param ConnectionInterface $db
      * @return array
-     * @throws \Exception
      */
-    public function all($db = null)
+    public function all(ConnectionInterface $db = null): array
     {
         if ($this->emulateExecution) {
             return [];

@@ -3,25 +3,27 @@ declare(strict_types=1);
 
 namespace Rabbit\DB\Redisql;
 
-use rabbit\db\Exception;
+use Exception;
+use Rabbit\DB\ConnectionInterface;
+use Throwable;
 
 /**
  * Class ActiveQuery
  * @package Rabbit\DB\Redisql
  */
-class ActiveQuery extends \rabbit\activerecord\ActiveQuery
+class ActiveQuery extends \Rabbit\ActiveRecord\ActiveQuery
 {
     use QueryTrait;
 
     /** @var ActiveRecord */
-    public $model;
+    public ?ActiveRecord $model = null;
 
     /**
-     * @param null $db
-     * @return \rabbit\db\Command
-     * @throws \Exception
+     * @param ConnectionInterface|null $db
+     * @return \Rabbit\DB\Command
+     * @throws Throwable
      */
-    public function createCommand($db = null)
+    public function createCommand(ConnectionInterface $db = null): \Rabbit\DB\Command
     {
         /* @var $modelClass ActiveRecord */
         $modelClass = $this->modelClass;

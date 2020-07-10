@@ -3,22 +3,23 @@ declare(strict_types=1);
 
 namespace Rabbit\DB\Redisql;
 
-use Exception;
+use Rabbit\DB\ConnectionInterface;
+use Throwable;
 
 /**
  * Class Query
  * @package Rabbit\DB\Redisql
  */
-class Query extends \rabbit\db\Query
+class Query extends \Rabbit\DB\Query
 {
     use QueryTrait;
 
     /**
-     * @param null $db
-     * @return \rabbit\db\Command
-     * @throws Exception
+     * @param ConnectionInterface|null $db
+     * @return \Rabbit\DB\Command
+     * @throws Throwable
      */
-    public function createCommand($db = null)
+    public function createCommand(ConnectionInterface $db = null): \Rabbit\DB\Command
     {
         if ($db === null) {
             $db = getDI('redisql')->get();

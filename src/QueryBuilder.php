@@ -3,23 +3,25 @@ declare(strict_types=1);
 
 namespace Rabbit\DB\Redisql;
 
-use rabbit\db\ExpressionInterface;
-use rabbit\db\Query;
-use rabbit\exception\InvalidConfigException;
-use rabbit\exception\NotSupportedException;
+
+use Rabbit\Base\Exception\NotSupportedException;
+use Rabbit\DB\Exception;
+use Rabbit\DB\ExpressionInterface;
+use Rabbit\DB\Query;
+use Throwable;
 
 /**
  * Class QueryBuilder
  * @package Rabbit\DB\Redisql
  */
-class QueryBuilder extends \rabbit\db\QueryBuilder
+class QueryBuilder extends \Rabbit\DB\QueryBuilder
 {
     /**
      * @param string|null $value
      * @param array $params
      * @return string
      */
-    public function bindParam($value, &$params)
+    public function bindParam(?string $value, array &$params): string
     {
         $phName = '?' . (count($params) + 1);
         $params[$phName] = $value;
@@ -29,10 +31,10 @@ class QueryBuilder extends \rabbit\db\QueryBuilder
     /**
      * {@inheritdoc}
      */
-    protected function defaultExpressionBuilders()
+    protected function defaultExpressionBuilders(): array
     {
         return array_merge(parent::defaultExpressionBuilders(), [
-            \rabbit\db\PdoValueBuilder::class => ValueBuilder::class,
+            \Rabbit\DB\PdoValueBuilder::class => ValueBuilder::class,
         ]);
     }
 
@@ -40,10 +42,10 @@ class QueryBuilder extends \rabbit\db\QueryBuilder
      * @param Query $query
      * @param array $params
      * @return array
-     * @throws NotSupportedException
-     * @throws InvalidConfigException
+     * @throws Exception
+     * @throws Throwable
      */
-    public function build($query, $params = [])
+    public function build(Query $query, array $params = []): array
     {
         if ($query instanceof ActiveQuery && empty($query->select)) {
             $query->select($query->model->attributes());
@@ -55,11 +57,12 @@ class QueryBuilder extends \rabbit\db\QueryBuilder
      * @param array $columns
      * @param array $params
      * @param bool $distinct
-     * @param null $selectOption
+     * @param string|null $selectOption
      * @return string
-     * @throws NotSupportedException|InvalidConfigException
+     * @throws Exception
+     * @throws Throwable
      */
-    public function buildSelect($columns, &$params, $distinct = false, $selectOption = null)
+    public function buildSelect(array $columns, array &$params, bool $distinct = false, string $selectOption = null)
     {
         $select = $distinct ? 'SELECT DISTINCT' : 'SELECT';
         if ($selectOption !== null) {

@@ -4,15 +4,14 @@ declare(strict_types=1);
 namespace Rabbit\DB\Redisql;
 
 use Exception;
-use rabbit\db\Command as BaseCommand;
-use rabbit\db\Exception as DbException;
+use Rabbit\DB\DataReader;
+use Throwable;
 
 /**
  * Class Command
- * @package rabbit\db\click
- * @property $db \rabbit\db\click\Connection
+ * @package Rabbit\DB\Redisql
  */
-class Command extends BaseCommand
+class Command extends \Rabbit\DB\Command
 {
     const FETCH = 'fetch';
     const FETCH_ALL = 'fetchAll';
@@ -20,13 +19,13 @@ class Command extends BaseCommand
     const FETCH_SCALAR = 'fetchScalar';
 
     /** @var int fetch type result */
-    public $fetchMode = 0;
+    public int $fetchMode = 0;
 
     /**
      * @param array $values
-     * @return $this|BaseCommand
+     * @return $this
      */
-    public function bindValues($values)
+    public function bindValues(array $values): self
     {
         if (empty($values)) {
             return $this;
@@ -40,9 +39,9 @@ class Command extends BaseCommand
 
     /**
      * @return int
-     * @throws Exception
+     * @throws Throwable
      */
-    public function execute()
+    public function execute(): int
     {
         $rawSql = $this->getRawSql();
         $this->logQuery($rawSql, 'redisql');
@@ -59,11 +58,11 @@ class Command extends BaseCommand
                 $data = $conn->executeCommand('REDISQL.EXEC_STATEMENT', [$dbname, $stmt, array_values($this->params)]);
             }
             if ($data[0] === 'DONE' && $data[1] === '0') {
-                return false;
+                return 0;
             }
-            return $data;
+            return (int)$data;
         } catch (Exception $e) {
-            throw new DbException("ActiveQuery error: " . $e->getMessage());
+            throw new Exception("ActiveQuery error: " . $e->getMessage());
         } finally {
             $conn->release(true);
         }
@@ -71,19 +70,19 @@ class Command extends BaseCommand
 
 
     /**
-     * @return array|mixed|null
-     * @throws DbException
+     * @return array|null
+     * @throws Exception
      */
-    public function queryColumn()
+    public function queryColumn(): ?array
     {
         return $this->queryInternal(self::FETCH_COLUMN);
     }
 
     /**
-     * @return array|false|int|mixed|string|null
-     * @throws DbException
+     * @return string|null
+     * @throws Exception
      */
-    public function queryScalar()
+    public function queryScalar(): ?string
     {
         $result = $this->queryInternal(self::FETCH_SCALAR, 0);
         if (is_array($result)) {
@@ -96,7 +95,7 @@ class Command extends BaseCommand
     /**
      * @return string
      */
-    public function getRawSql()
+    public function getRawSql(): string
     {
         if (empty($this->params)) {
             return $this->_sql;
@@ -125,12 +124,11 @@ class Command extends BaseCommand
 
     /**
      * @param string $method
-     * @param null $fetchMode
-     * @return array|mixed|null
-     * @throws DbException
-     * @throws Exception
+     * @param int|null $fetchMode
+     * @return array|bool|mixed|DataReader|null
+     * @throws Throwable
      */
-    protected function queryInternal($method, $fetchMode = null)
+    protected function queryInternal(string $method, int $fetchMode = null)
     {
         $rawSql = $this->getRawSql();
         $this->logQuery($rawSql);
@@ -152,7 +150,7 @@ class Command extends BaseCommand
             }
             return $this->prepareResult($data, $method);
         } catch (Exception $e) {
-            throw new DbException("ActiveQuery error: " . $e->getMessage());
+            throw new Exception("ActiveQuery error: " . $e->getMessage());
         } finally {
             $conn->release(true);
         }
