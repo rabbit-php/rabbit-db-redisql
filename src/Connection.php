@@ -8,6 +8,7 @@ use DI\NotFoundException;
 use Rabbit\Base\App;
 use Rabbit\DB\Redis\Redis;
 use Rabbit\Pool\PoolManager;
+use ReflectionException;
 use Throwable;
 
 /**
@@ -45,16 +46,17 @@ class Connection extends \Rabbit\DB\Connection
     }
 
     /**
-     * @return mixed|\rabbit\db\Schema
+     * @return \Rabbit\DB\Schema
      * @throws DependencyException
      * @throws NotFoundException
+     * @throws ReflectionException
      */
     public function getSchema(): \Rabbit\DB\Schema
     {
-        if ($this->_schema !== null) {
-            return $this->_schema;
+        if ($this->schema !== null) {
+            return $this->schema;
         }
-        return $this->_schema = create([
+        return $this->schema = create([
             'class' => Schema::class,
             'db' => $this
         ]);

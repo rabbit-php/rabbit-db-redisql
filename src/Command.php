@@ -51,9 +51,9 @@ class Command extends \Rabbit\DB\Command
             if (empty($this->params)) {
                 $data = $conn->executeCommand("REDISQL.EXEC", [$dbname, $rawSql]);
             } else {
-                $stmt = md5($this->_sql);
+                $stmt = md5($this->sql);
                 if ($conn->setnx($stmt, 1)) {
-                    $conn->executeCommand("REDISQL.CREATE_STATEMENT", [$dbname, $stmt, $this->_sql]);
+                    $conn->executeCommand("REDISQL.CREATE_STATEMENT", [$dbname, $stmt, $this->sql]);
                 }
                 $data = $conn->executeCommand('REDISQL.EXEC_STATEMENT', [$dbname, $stmt, array_values($this->params)]);
             }
@@ -98,7 +98,7 @@ class Command extends \Rabbit\DB\Command
     public function getRawSql(): string
     {
         if (empty($this->params)) {
-            return $this->_sql;
+            return $this->sql;
         }
         $params = [];
         foreach ($this->params as $name => $value) {
@@ -113,10 +113,10 @@ class Command extends \Rabbit\DB\Command
             }
         }
         if (!isset($params[0])) {
-            return strtr($this->_sql, $params);
+            return strtr($this->sql, $params);
         }
         $sql = '';
-        foreach (explode('?', $this->_sql) as $i => $part) {
+        foreach (explode('?', $this->sql) as $i => $part) {
             $sql .= $part . (isset($params[$i]) ? $params[$i] : '');
         }
         return $sql;
@@ -139,9 +139,9 @@ class Command extends \Rabbit\DB\Command
             if (empty($this->params)) {
                 $data = $conn->executeCommand("REDISQL.QUERY", [$dbname, $rawSql]);
             } else {
-                $stmt = md5($this->_sql);
+                $stmt = md5($this->sql);
                 if ($conn->setnx($stmt, 1)) {
-                    $conn->executeCommand("REDISQL.CREATE_STATEMENT", [$dbname, $stmt, $this->_sql]);
+                    $conn->executeCommand("REDISQL.CREATE_STATEMENT", [$dbname, $stmt, $this->sql]);
                 }
                 $data = $conn->executeCommand('REDISQL.QUERY_STATEMENT', [$dbname, $stmt, array_values($this->params)]);
             }
